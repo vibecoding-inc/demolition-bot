@@ -1,4 +1,5 @@
 import express from 'express';
+import rateLimit from 'express-rate-limit';
 import { Webhooks } from '@octokit/webhooks';
 import { DemolitionBot } from './bot';
 import * as dotenv from 'dotenv';
@@ -8,6 +9,15 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Rate limiter for webhook endpoint
+const webhookLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Initialize webhooks
 const webhooks = new Webhooks({
   secret: process.env.GITHUB_WEBHOOK_SECRET || 'your-webhook-secret'
@@ -16,8 +26,8 @@ const webhooks = new Webhooks({
 // Initialize bot
 const bot = new DemolitionBot(process.env.GITHUB_TOKEN || '');
 
-// Webhook endpoint
-app.post('/webhook', express.json(), async (req, res) => {
+// Webhook endpoint with rate limiting
+app.post('/webhook', webhookLimiter, express.json(), async (req, res) => {
   try {
     await webhooks.verifyAndReceive({
       id: req.headers['x-github-delivery'] as string,
