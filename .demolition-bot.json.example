@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "maxPRsPerRun": 5,
+  "ignoredPackages": [
+    "typescript",
+    "eslint"
+  ],
+  "targetSeverity": [
+    "critical",
+    "high"
+  ]
+}
