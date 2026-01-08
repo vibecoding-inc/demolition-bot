@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  demolition-bot:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - GITHUB_APP_ID=${GITHUB_APP_ID}
+      - GITHUB_PRIVATE_KEY=${GITHUB_PRIVATE_KEY}
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
+      - PORT=3000
+    restart: unless-stopped
